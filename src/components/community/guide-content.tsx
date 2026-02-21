@@ -284,7 +284,7 @@ export function GuideContent() {
 
               <div className="pt-2">
                 <Button asChild>
-                  <Link href="/listings/realty">
+                  <Link href="/a/aparts">
                     <Home className="mr-2 h-4 w-4" />
                     Смотреть объявления
                   </Link>
@@ -331,7 +331,7 @@ export function GuideContent() {
 
               <div className="pt-2">
                 <Button asChild>
-                  <Link href="/listings/parking">
+                  <Link href="/a/parking">
                     <Car className="mr-2 h-4 w-4" />
                     Смотреть паркинг
                   </Link>

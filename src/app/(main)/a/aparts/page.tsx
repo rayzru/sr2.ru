@@ -72,7 +72,7 @@ function RealtyListingsPageContent() {
     } else {
       params.set(key, value);
     }
-    router.push(`/listings/realty?${params.toString()}`);
+    router.push(`/a/aparts?${params.toString()}`);
     setPage(1);
   };
 
@@ -139,7 +139,7 @@ function RealtyListingsPageContent() {
       <PageHeader
         title="Недвижимость"
         description="Аренда и продажа квартир"
-        backHref="/listings"
+        backHref="/a"
         icon={
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-600">
             <Home className="h-5 w-5 text-white" />
@@ -204,7 +204,7 @@ function RealtyListingsPageContent() {
           <p className="text-muted-foreground mt-4 text-lg font-medium">Объявления не найдены</p>
           {(currentType || currentBuilding) && (
             <button
-              onClick={() => router.push("/listings/realty")}
+              onClick={() => router.push("/a/aparts")}
               className="text-primary mt-2 text-sm hover:underline"
             >
               Сбросить фильтры

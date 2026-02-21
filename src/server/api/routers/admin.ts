@@ -1,21 +1,15 @@
 import { TRPCError } from "@trpc/server";
-import { logger } from "~/lib/logger";
-
-
 import { and, count, desc, eq, gte, ilike, inArray, isNull, or, sql } from "drizzle-orm";
-
 import { z } from "zod";
 
-
 import {
-
   BLOCK_CATEGORIES,
   type BlockCategory,
   RULES_VIOLATIONS,
   type RuleViolation,
 } from "~/lib/block-reasons";
+import { logger } from "~/lib/logger";
 import {
-
   checkChatMember,
   getAdminChatId,
   getBotInfo,
@@ -23,9 +17,7 @@ import {
   isAdminChatConfigured,
 } from "~/lib/telegram";
 import { hasFeatureAccess, type UserRole } from "~/server/auth/rbac";
-
 import {
-
   accounts,
   apartments,
   buildings,
@@ -53,7 +45,6 @@ import {
 } from "~/server/db/schema";
 
 import {
-
   adminProcedure,
   adminProcedureWithFeature,
   createTRPCRouter,
@@ -365,9 +356,7 @@ export const adminRouter = createTRPCRouter({
         });
 
         // Check if any user is Root
-        const hasRoot = usersToDelete.some((user) =>
-          user.roles.some((r) => r.role === "Root")
-        );
+        const hasRoot = usersToDelete.some((user) => user.roles.some((r) => r.role === "Root"));
 
         if (hasRoot) {
           throw new TRPCError({
@@ -411,9 +400,7 @@ export const adminRouter = createTRPCRouter({
 
           if (dependencies.length > 0) {
             const user = usersToDelete.find((u) => u.id === userId);
-            usersWithDependencies.push(
-              `${user?.name ?? userId}: ${dependencies.join(", ")}`
-            );
+            usersWithDependencies.push(`${user?.name ?? userId}: ${dependencies.join(", ")}`);
           }
         }
 

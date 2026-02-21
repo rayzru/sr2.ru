@@ -1,7 +1,7 @@
-import { logger } from "~/lib/logger";
-
 import type { JSONContent } from "@tiptap/react";
 import { inArray } from "drizzle-orm";
+
+import { logger } from "~/lib/logger";
 
 import { db } from "./index";
 import { directoryTags, knowledgeBaseArticles, knowledgeBaseArticleTags } from "./schema";

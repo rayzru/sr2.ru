@@ -88,7 +88,7 @@ export default function TermsPage() {
           <p>
             2.3. Пользователь обязуется не использовать Сервис для противоправных целей, не нарушать
             права других пользователей и соблюдать{" "}
-            <Link href="/community/rules" className="text-primary hover:underline">
+            <Link href="/larina-45/rules" className="text-primary hover:underline">
               Правила сообщества
             </Link>
             .

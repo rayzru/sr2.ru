@@ -46,34 +46,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Community static pages
   const communityPages: MetadataRoute.Sitemap = [
     {
-      url: `${siteUrl}/community`,
+      url: `${siteUrl}/larina-45`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/community/rules`,
+      url: `${siteUrl}/larina-45/rules`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${siteUrl}/community/guide`,
+      url: `${siteUrl}/larina-45/guide`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${siteUrl}/community/chats`,
+      url: `${siteUrl}/larina-45/chats`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${siteUrl}/community/contribute`,
+      url: `${siteUrl}/larina-45/contribute`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/larina-45/map`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
   ];
 

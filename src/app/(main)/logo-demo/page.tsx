@@ -3,6 +3,14 @@ import { AnimatedLogo } from "~/components/animated-logo";
 export default function LogoDemoPage() {
   return (
     <div className="container mx-auto min-h-screen space-y-12 p-8">
+      {/* Banner */}
+      <div className="flex min-h-64 flex-col items-center justify-center gap-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 px-8 py-16 dark:from-slate-800 dark:to-slate-900">
+        <AnimatedLogo className="w-full max-w-lg" />
+        <p className="text-muted-foreground text-center text-sm">
+          Наведите курсор на логотип — СР2 раскрывается в СЕРДЦЕ РОСТОВА 2
+        </p>
+      </div>
+
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Animated Logo Demo</h1>
         <p className="text-muted-foreground">

@@ -1,8 +1,8 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { logger } from "~/lib/logger";
 import { type NextRequest } from "next/server";
 
 import { env } from "~/env";
+import { logger } from "~/lib/logger";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
 

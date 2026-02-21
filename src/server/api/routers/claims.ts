@@ -3,7 +3,6 @@ import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { logger } from "~/lib/logger";
-
 import { type UserRole } from "~/server/auth/rbac";
 import {
   apartments,

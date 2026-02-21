@@ -1,15 +1,14 @@
 import Link from "next/link";
 
-import { getRankConfig } from "~/lib/ranks";
-import { cn } from "~/lib/utils";
 import { auth } from "~/server/auth";
 import { isAdmin, type UserRole } from "~/server/auth/rbac";
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import { AccountSheet } from "./account-sheet";
 import { MobileNav } from "./mobile-nav";
 import { NavLinks } from "./nav-links";
 import { NavLogo } from "./nav-logo";
+import { UserNav } from "./user-nav";
 
 // Pages where we don't show the login button (user is already on auth flow)
 const AUTH_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
@@ -22,69 +21,51 @@ export async function Navigation({ pathname = "" }: NavigationProps) {
   const session = await auth();
   const userRoles = session?.user?.roles ?? [];
   const hasAdminAccess = isAdmin(userRoles);
-  const rankConfig = getRankConfig(userRoles);
-
   return (
-    <div className="mt-4 flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-6">
-      {/* Left side: Logo - aligned left */}
+    <div className="flex h-16 items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-6">
+      {/* Left side: Logo */}
       <div className="flex items-center justify-start">
         <NavLogo />
       </div>
 
-      {/* Center: Desktop navigation - truly centered */}
+      {/* Center: Desktop mega-menu */}
       <NavLinks />
 
-      {/* Right side: user actions - aligned right */}
+      {/* Right side: user actions */}
       <div className="flex items-center justify-end gap-2">
         {!session && !AUTH_PAGES.some((p) => pathname.startsWith(p)) && (
-          <Link passHref href={"/login"} data-testid="nav-login">
+          <Link passHref href="/login" data-testid="nav-login">
             <Button>Войти</Button>
           </Link>
         )}
 
         {session && (
           <>
-            {/* Desktop: user menu with role-colored ring, auto width up to sidebar width */}
-            <div className="hidden max-w-64 items-center justify-end lg:flex">
-              <Link href="/my" passHref data-testid="nav-user-cabinet">
-                <Button variant="ghost" size="sm" className="justify-start">
-                  <Avatar
-                    className={cn(
-                      "ring-offset-background h-5 w-5 shrink-0 ring-2 ring-offset-1",
-                      rankConfig.ringColor
-                    )}
-                  >
-                    <AvatarImage src={session.user.image ?? undefined} />
-                    <AvatarFallback className="text-[10px]">
-                      {session.user.name?.slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="truncate">{session.user.name ?? "Кабинет"}</span>
-                </Button>
-              </Link>
-            </div>
+            {/* Desktop: dropdown user menu */}
+            <UserNav
+              user={{
+                name: session.user.name,
+                email: session.user.email,
+                image: session.user.image,
+                roles: userRoles as string[],
+              }}
+              isAdmin={hasAdminAccess}
+            />
 
-            {/* Mobile/Tablet: only avatar with role ring */}
-            <Link href="/my" passHref data-testid="nav-user-cabinet-mobile" className="lg:hidden">
-              <Button variant="ghost" size="icon">
-                <Avatar
-                  className={cn(
-                    "ring-offset-background h-6 w-6 ring-2 ring-offset-1",
-                    rankConfig.ringColor
-                  )}
-                >
-                  <AvatarImage src={session.user.image ?? undefined} />
-                  <AvatarFallback className="text-xs">
-                    {session.user.name?.slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </Link>
+            {/* Mobile: account sheet trigger */}
+            <AccountSheet
+              user={{
+                name: session.user.name,
+                image: session.user.image,
+                roles: userRoles as string[],
+              }}
+              isAdmin={hasAdminAccess}
+            />
           </>
         )}
 
         {/* Mobile: burger menu */}
-        <MobileNav user={session?.user} isAdmin={hasAdminAccess} />
+        <MobileNav isAuthenticated={!!session} />
       </div>
     </div>
   );

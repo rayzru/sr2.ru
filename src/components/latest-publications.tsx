@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   HelpCircle,
   Megaphone,
   MessageSquare,
@@ -13,8 +12,9 @@ import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
+import { SectionHeader } from "~/components/ui/section-header";
+import { formatRelativeDate } from "~/lib/format-date";
 import { cn } from "~/lib/utils";
 import type { PublicationType } from "~/server/db/schema";
 import { api } from "~/trpc/server";
@@ -79,18 +79,7 @@ export async function LatestPublications({ variant = "grid" }: LatestPublication
     return (
       <section>
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="text-muted-foreground h-5 w-5" />
-            <h2 className="text-lg font-semibold">Публикации</h2>
-          </div>
-          <Button variant="ghost" size="sm" className="h-auto px-2 py-1 text-xs" asChild>
-            <Link href="/publications" className="gap-1">
-              Все
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </Button>
-        </div>
+        <SectionHeader icon={MessageSquare} title="Публикации" href="/publications" />
 
         {/* Publications List */}
         <div className="space-y-3">
@@ -149,19 +138,12 @@ export async function LatestPublications({ variant = "grid" }: LatestPublication
 
   return (
     <section className="py-8">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="text-muted-foreground h-5 w-5" />
-          <h2 className="text-xl font-semibold">Публикации</h2>
-        </div>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/publications" className="gap-1">
-            Все публикации
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
+      <SectionHeader
+        icon={MessageSquare}
+        title="Публикации"
+        href="/publications"
+        linkLabel="Все публикации"
+      />
 
       {/* Publications Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -228,27 +210,4 @@ export async function LatestPublications({ variant = "grid" }: LatestPublication
       </div>
     </section>
   );
-}
-
-// ============================================================================
-// Utilities
-// ============================================================================
-
-function formatRelativeDate(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) {
-    return "Сегодня";
-  } else if (diffDays === 1) {
-    return "Вчера";
-  } else if (diffDays < 7) {
-    return `${diffDays} дн. назад`;
-  } else {
-    return new Intl.DateTimeFormat("ru-RU", {
-      day: "numeric",
-      month: "short",
-    }).format(date);
-  }
 }

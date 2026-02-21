@@ -26,8 +26,8 @@ export function DocumentsForm({ documents, onDocumentsChange }: DocumentsFormPro
             рассмотрения вашей заявки.
           </p>
           <p className="text-muted-foreground">
-            Без документов проверка может быть выполнена только в личном порядке с
-            администрацией, что займет больше времени.
+            Без документов проверка может быть выполнена только в личном порядке с администрацией,
+            что займет больше времени.
           </p>
         </AlertDescription>
       </Alert>

@@ -324,7 +324,7 @@ export default function AdminClaimsPage() {
       if (selectedClaimIds.size === data.claims.length) {
         setSelectedClaimIds(new Set());
       } else {
-        setSelectedClaimIds(new Set(data.claims.map(c => c.id)));
+        setSelectedClaimIds(new Set(data.claims.map((c) => c.id)));
       }
     }
   };
@@ -502,24 +502,14 @@ export default function AdminClaimsPage() {
 
       {/* Bulk Action Toolbar */}
       {selectedClaimIds.size > 0 && (
-        <div className="mb-4 flex items-center gap-3 rounded-md border bg-muted p-3">
-          <span className="text-sm font-medium">
-            Выбрано заявок: {selectedClaimIds.size}
-          </span>
+        <div className="bg-muted mb-4 flex items-center gap-3 rounded-md border p-3">
+          <span className="text-sm font-medium">Выбрано заявок: {selectedClaimIds.size}</span>
           <Separator orientation="vertical" className="h-6" />
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowBulkDeleteDialog(true)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => setShowBulkDeleteDialog(true)}>
             <Trash2 className="mr-2 h-4 w-4" />
             Удалить выбранные
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSelectedClaimIds(new Set())}
-          >
+          <Button variant="outline" size="sm" onClick={() => setSelectedClaimIds(new Set())}>
             Отменить выбор
           </Button>
         </div>
@@ -827,12 +817,12 @@ export default function AdminClaimsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <AlertTriangle className="text-destructive h-5 w-5" />
               Удаление {selectedClaimIds.size} заявок
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие удалит {selectedClaimIds.size} заявок без возможности восстановления.
-              Все данные и документы будут удалены немедленно.
+              Это действие удалит {selectedClaimIds.size} заявок без возможности восстановления. Все
+              данные и документы будут удалены немедленно.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2">

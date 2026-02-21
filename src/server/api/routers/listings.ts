@@ -1,16 +1,10 @@
 import { TRPCError } from "@trpc/server";
-import { logger } from "~/lib/logger";
-
-
 import { and, count, desc, eq, or } from "drizzle-orm";
-
 import { z } from "zod";
 
-
+import { logger } from "~/lib/logger";
 import { deleteImage } from "~/lib/upload/image-processor";
-
 import {
-
   buildings,
   listingPhotos,
   listings,
@@ -20,7 +14,6 @@ import {
 } from "~/server/db/schema";
 
 import {
-
   adminProcedureWithFeature,
   createTRPCRouter,
   protectedProcedure,

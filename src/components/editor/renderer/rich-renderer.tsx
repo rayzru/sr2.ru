@@ -1,9 +1,9 @@
-import { logger } from "~/lib/logger";
 import { Fragment, type ReactNode } from "react";
 
 import type { JSONContent } from "@tiptap/react";
 
 import type { RichRendererProps } from "~/lib/editor";
+import { logger } from "~/lib/logger";
 import { cn } from "~/lib/utils";
 
 import {

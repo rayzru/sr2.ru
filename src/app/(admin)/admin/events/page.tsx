@@ -198,17 +198,55 @@ export default function AdminEventsPage() {
     }
   };
 
-  // Format date for display
-  const formatEventDate = (date: Date | null) => {
-    if (!date) return null;
-    return new Date(date).toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const TZ = "Europe/Moscow";
+
+  const fmtDate = (d: Date) =>
+    new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", timeZone: TZ }).format(d);
+
+  const fmtTime = (d: Date) =>
+    new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: TZ }).format(d);
+
+  // Build schedule summary for the date column
+  const formatSchedule = (item: (typeof events)[number]) => {
+    const start = item.eventStartAt ? new Date(item.eventStartAt) : null;
+    const end = item.eventEndAt ? new Date(item.eventEndAt) : null;
+    if (!start) return { primary: "—", secondary: null };
+
+    const recLabel =
+      item.eventRecurrenceType && item.eventRecurrenceType !== "none"
+        ? ({ monthly: "ежемесячно", weekly: "еженедельно", yearly: "ежегодно", daily: "ежедневно" }[
+            item.eventRecurrenceType
+          ] ?? item.eventRecurrenceType)
+        : null;
+
+    if (item.eventAllDay) {
+      const startStr = fmtDate(start);
+      const endStr = end ? fmtDate(end) : null;
+      const primary =
+        endStr && endStr !== startStr ? `${startStr} — ${endStr}` : startStr;
+      return { primary, secondary: recLabel };
+    }
+
+    // Timed event
+    const primary = fmtDate(start);
+    const timeStr = end ? `${fmtTime(start)} — ${fmtTime(end)}` : fmtTime(start);
+    const secondary = recLabel ? `${timeStr} · ${recLabel}` : timeStr;
+    return { primary, secondary };
   };
+
+  // Sort events by nearest upcoming date (past events go to bottom)
+  const sortedEvents = [...events].sort((a, b) => {
+    const now = Date.now();
+    const aMs = a.eventStartAt ? new Date(a.eventStartAt).getTime() : 0;
+    const bMs = b.eventStartAt ? new Date(b.eventStartAt).getTime() : 0;
+    // Future/ongoing first, ascending; past last, descending
+    const aFuture = aMs >= now;
+    const bFuture = bMs >= now;
+    if (aFuture && !bFuture) return -1;
+    if (!aFuture && bFuture) return 1;
+    if (aFuture && bFuture) return aMs - bMs;
+    return bMs - aMs; // both past: most recent first
+  });
 
   // Check if event is upcoming
   const isUpcoming = (startAt: Date | null) => {
@@ -280,7 +318,7 @@ export default function AdminEventsPage() {
         <div className="rounded-lg border">
           {/* Table Header */}
           <div className="bg-muted/50 text-muted-foreground flex items-center gap-4 border-b px-4 py-3 text-sm font-medium">
-            <div className="w-24">Дата</div>
+            <div className="w-36">Расписание</div>
             <div className="min-w-0 flex-1">Название</div>
             <div className="hidden w-32 sm:block">Место</div>
             <div className="hidden w-32 md:block">Автор</div>
@@ -289,37 +327,26 @@ export default function AdminEventsPage() {
           </div>
 
           {/* Table Body */}
-          {events.map((item) => {
+          {sortedEvents.map((item) => {
             const statusConfig = STATUS_CONFIG[item.status];
             const upcoming = item.eventStartAt && isUpcoming(item.eventStartAt);
             const ongoing = item.eventStartAt && isOngoing(item.eventStartAt, item.eventEndAt);
             const isPast = !upcoming && !ongoing && item.eventStartAt !== null;
+            const schedule = formatSchedule(item);
 
             return (
               <div
                 key={item.id}
                 className={`hover:bg-muted/30 flex items-center gap-4 border-b px-4 py-3 transition-colors last:border-b-0 ${isPast ? "opacity-50" : ""}`}
               >
-                {/* Date Column */}
-                <div className="w-24 shrink-0">
-                  {item.eventStartAt ? (
-                    <div className="text-sm">
-                      <div className="font-medium">
-                        {new Date(item.eventStartAt).toLocaleDateString("ru-RU", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        {new Date(item.eventStartAt).toLocaleTimeString("ru-RU", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">—</span>
-                  )}
+                {/* Schedule Column */}
+                <div className="w-36 shrink-0">
+                  <div className="text-sm">
+                    <div className="font-medium">{schedule.primary}</div>
+                    {schedule.secondary && (
+                      <div className="text-muted-foreground text-xs">{schedule.secondary}</div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Title Column */}

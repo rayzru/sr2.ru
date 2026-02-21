@@ -52,14 +52,16 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="flex min-h-screen flex-col">
+      <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
+        <div className="container m-auto max-w-7xl px-5">
+          <Navigation pathname={pathname} />
+        </div>
+      </header>
       <div
         data-wrapper=""
-        className="min-w-xs container m-auto grid max-w-7xl flex-1 grid-cols-12 gap-4 px-[20px]"
+        className="min-w-xs container m-auto grid max-w-7xl flex-1 grid-cols-12 gap-4 px-5"
       >
-        <main className="col-span-full">
-          <Navigation pathname={pathname} />
-          {children}
-        </main>
+        <main className="col-span-full">{children}</main>
       </div>
       <SiteFooter />
     </div>

@@ -14,7 +14,7 @@ export default function ListingsPage() {
       {/* Category cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {/* Parking */}
-        <Link href="/listings/parking">
+        <Link href="/a/parking">
           <Card className="relative h-full cursor-pointer overflow-hidden transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-lg dark:hover:bg-blue-950/30">
             <Car className="text-muted-foreground/10 absolute -bottom-6 -right-6 h-32 w-32" />
             <CardHeader className="relative z-10">
@@ -27,7 +27,7 @@ export default function ListingsPage() {
         </Link>
 
         {/* Realty */}
-        <Link href="/listings/realty">
+        <Link href="/a/aparts">
           <Card className="relative h-full cursor-pointer overflow-hidden transition-all hover:border-green-200 hover:bg-green-50 hover:shadow-lg dark:hover:bg-green-950/30">
             <Home className="text-muted-foreground/10 absolute -bottom-6 -right-6 h-32 w-32" />
             <CardHeader className="relative z-10">

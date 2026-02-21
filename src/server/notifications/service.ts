@@ -29,7 +29,6 @@ import type {
 
 const getBaseUrl = (): string => {
   if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return "http://localhost:3000";
 };
 
@@ -355,7 +354,10 @@ export async function notify(
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    logger.error({ err: error, type: event.type, email: event.email }, "Failed to send notification");
+    logger.error(
+      { err: error, type: event.type, email: event.email },
+      "Failed to send notification"
+    );
     return { success: false, error: errorMessage };
   }
 }

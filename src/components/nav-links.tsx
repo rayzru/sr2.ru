@@ -1,70 +1,100 @@
 "use client";
 
-import { BookOpen, Info, MessageSquareText, Tag, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "~/components/ui/navigation-menu";
+import { NAV_GROUPS } from "~/lib/navigation";
 import { cn } from "~/lib/utils";
-
-import { Button } from "./ui/button";
-
-const navigation = [
-  {
-    title: "Справочная",
-    link: "/",
-    icon: Info,
-    testId: "nav-info",
-  },
-  {
-    title: "Чего",
-    link: "/howtos",
-    icon: BookOpen,
-    testId: "nav-howtos",
-  },
-  {
-    title: "Объявления",
-    link: "/listings",
-    icon: Tag,
-    testId: "nav-listings",
-  },
-  {
-    title: "Сообщество",
-    link: "/community",
-    icon: Users,
-    testId: "nav-community",
-  },
-  {
-    title: "Контакты",
-    link: "/feedback",
-    icon: MessageSquareText,
-    testId: "nav-feedback",
-  },
-];
 
 export function NavLinks() {
   const pathname = usePathname();
 
-  const isActive = (link: string) => {
-    if (link === "/") return pathname === "/";
-    return pathname.startsWith(link);
+  const isGroupActive = (group: (typeof NAV_GROUPS)[number]) => {
+    if (group.direct && group.href) {
+      return pathname.startsWith(group.href);
+    }
+    return group.items.some((item) => {
+      if (item.href === "/") return pathname === "/";
+      return pathname.startsWith(item.href);
+    });
   };
 
   return (
-    <div className="hidden items-center gap-1 lg:flex">
-      {navigation.map((item) => {
-        const active = isActive(item.link);
-        return (
-          <Link key={item.title} href={item.link} passHref data-testid={item.testId}>
-            <Button
-              variant={active ? "secondary" : "ghost"}
-              size="sm"
-              className={cn(active && "text-primary font-medium")}
-            >
-              {item.title}
-            </Button>
-          </Link>
-        );
-      })}
-    </div>
+    <NavigationMenu className="hidden lg:flex">
+      <NavigationMenuList>
+        {NAV_GROUPS.map((group) => {
+          const active = isGroupActive(group);
+
+          if (group.direct && group.href) {
+            return (
+              <NavigationMenuItem key={group.title}>
+                <NavigationMenuLink asChild>
+                  <Link
+                    href={group.href}
+                    data-testid={group.testId}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      active && "bg-accent/60 text-accent-foreground font-medium"
+                    )}
+                  >
+                    {group.title}
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            );
+          }
+
+          return (
+            <NavigationMenuItem key={group.title} hasSubmenu>
+              <NavigationMenuTrigger
+                className={cn(active && "bg-accent/60 text-accent-foreground font-medium")}
+              >
+                {group.title}
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="w-105 grid gap-1 p-3 sm:grid-cols-2">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const itemActive =
+                      item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                    return (
+                      <li key={item.href}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href={item.href}
+                            data-testid={item.testId}
+                            className={cn(
+                              "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex select-none items-start gap-3 rounded-md p-3 leading-none no-underline outline-none transition-colors",
+                              itemActive && "bg-accent/60 text-accent-foreground"
+                            )}
+                          >
+                            <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+                            <div>
+                              <div className="text-sm font-medium leading-none">{item.title}</div>
+                              <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-snug">
+                                {item.description}
+                              </p>
+                            </div>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          );
+        })}
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 }

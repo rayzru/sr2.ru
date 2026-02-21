@@ -553,6 +553,28 @@ export const knowledgeRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  // Latest published articles for homepage feed
+  latest: publicProcedure
+    .input(z.object({ limit: z.number().min(1).max(20).default(4) }))
+    .query(async ({ ctx, input }) => {
+      const articles = await ctx.db
+        .select({
+          id: knowledgeBaseArticles.id,
+          slug: knowledgeBaseArticles.slug,
+          title: knowledgeBaseArticles.title,
+          excerpt: knowledgeBaseArticles.excerpt,
+          icon: knowledgeBaseArticles.icon,
+          createdAt: knowledgeBaseArticles.createdAt,
+          updatedAt: knowledgeBaseArticles.updatedAt,
+        })
+        .from(knowledgeBaseArticles)
+        .where(eq(knowledgeBaseArticles.status, "published"))
+        .orderBy(desc(knowledgeBaseArticles.updatedAt))
+        .limit(input.limit);
+
+      return articles;
+    }),
+
   // ============== ADMIN PROCEDURES ==============
 
   admin: createTRPCRouter({

@@ -1,7 +1,7 @@
-import { logger } from "~/lib/logger";
 import { randomUUID } from "crypto";
 import sharp from "sharp";
 
+import { logger } from "~/lib/logger";
 import { deleteFromS3, extractS3Key, generateS3Key, uploadToS3 } from "~/lib/s3/client";
 
 import {

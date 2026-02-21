@@ -115,6 +115,8 @@ export const publications = createTable(
     publishToTelegram: boolean("publish_to_telegram").notNull().default(false), // Опубликовать в Telegram (только админы)
 
     // ========== Event-specific fields (type: "event") ==========
+    // Весь день (без конкретного времени)
+    eventAllDay: boolean("event_all_day").notNull().default(false),
     // Дата и время начала события
     eventStartAt: timestamp("event_start_at", { withTimezone: true }),
     // Дата и время окончания события (опционально)
@@ -134,20 +136,18 @@ export const publications = createTable(
     eventOrganizerPhone: varchar("event_organizer_phone", { length: 20 }),
 
     // ========== Event Recurrence (повторяющиеся события) ==========
-    // Тип повторения
+    // Тип повторения — для быстрой фильтрации без парсинга RRULE
     eventRecurrenceType: eventRecurrenceTypeEnum("event_recurrence_type").default("none"),
-    // Интервал повторения (каждые N дней/недель/месяцев)
-    eventRecurrenceInterval: integer("event_recurrence_interval").default(1),
-    // День недели для еженедельных (0-6, воскресенье-суббота)
-    eventRecurrenceDayOfWeek: integer("event_recurrence_day_of_week"),
-    // День месяца для начала периода (для ежемесячных, например 18)
-    eventRecurrenceStartDay: integer("event_recurrence_start_day"),
-    // День месяца для конца периода (для ежемесячных, например 26)
-    eventRecurrenceEndDay: integer("event_recurrence_end_day"),
-    // Дата окончания повторений (null = бессрочно)
+    // RRULE строка (RFC 5545) — источник истины для паттерна повторения
+    // Примеры:
+    //   ежемесячно 20–25:  "FREQ=MONTHLY;BYMONTHDAY=20"
+    //   еженедельно пт:    "FREQ=WEEKLY;BYDAY=FR"
+    //   ежегодно 15 сен:   "FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=15"
+    eventRecurrenceRule: varchar("event_recurrence_rule", { length: 500 }),
+    // Дата окончания повторений (null = бессрочно) — для SQL фильтрации без парсинга RRULE
     eventRecurrenceUntil: timestamp("event_recurrence_until", { withTimezone: true }),
-    // Ссылка на статью базы знаний (howto)
-    linkedArticleId: uuid("linked_article_id"),
+    // Связанный контент (ссылки на новости, публикации, события, базу знаний)
+    linkedContentIds: jsonb("linked_content_ids").$type<{ id: string; type: string; title?: string }[]>(),
 
     // Author
     authorId: varchar("author_id", { length: 255 })

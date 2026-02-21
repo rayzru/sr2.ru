@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
-import { logger } from "~/lib/logger";
 import { NextResponse } from "next/server";
 
+import { logger } from "~/lib/logger";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { type MaintenanceSettings, SETTING_KEYS, systemSettings } from "~/server/db/schema";

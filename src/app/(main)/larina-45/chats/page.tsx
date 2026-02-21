@@ -167,7 +167,7 @@ export default function ChatsPage() {
             </p>
             <p className="mt-2">
               Все чаты подчиняются{" "}
-              <Link href="/community/rules" className="text-primary font-medium hover:underline">
+              <Link href="/larina-45/rules" className="text-primary font-medium hover:underline">
                 общим правилам сообщества
               </Link>
               .

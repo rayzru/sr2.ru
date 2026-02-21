@@ -1,6 +1,6 @@
-import { logger } from "~/lib/logger";
-
 import { eq, inArray } from "drizzle-orm";
+
+import { logger } from "~/lib/logger";
 
 import { db } from "./index";
 import { directoryTags, knowledgeBaseArticles, knowledgeBaseArticleTags } from "./schema";

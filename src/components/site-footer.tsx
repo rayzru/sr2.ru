@@ -55,10 +55,10 @@ export function SiteFooter() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:gap-12">
             <div className="flex flex-col gap-2 text-sm">
               <p className="text-foreground mb-1 text-xs font-medium">О сервисе</p>
-              <Link href="/community" className="link">
+              <Link href="/larina-45" className="link">
                 О проекте
               </Link>
-              <Link href="/community/rules" className="link">
+              <Link href="/larina-45/rules" className="link">
                 Правила сообщества
               </Link>
               <Link href="/terms" className="link">

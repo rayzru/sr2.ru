@@ -57,8 +57,8 @@ import { api } from "~/trpc/react";
 
 import { BlockUserDialog } from "./block-user-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
-import { HardDeleteUserDialog } from "./hard-delete-user-dialog";
 import { EditTaglineDialog } from "./edit-tagline-dialog";
+import { HardDeleteUserDialog } from "./hard-delete-user-dialog";
 import { UnblockUserDialog } from "./unblock-user-dialog";
 
 interface User {
@@ -373,7 +373,11 @@ function UserCard({
   );
 }
 
-export function UsersTable({ canManageRoles, canDeleteUsers, canHardDeleteUsers }: UsersTableProps) {
+export function UsersTable({
+  canManageRoles,
+  canDeleteUsers,
+  canHardDeleteUsers,
+}: UsersTableProps) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -434,7 +438,8 @@ export function UsersTable({ canManageRoles, canDeleteUsers, canHardDeleteUsers 
   const handleBulkDelete = () => {
     const userIds = Array.from(selectedUserIds).filter((id) => {
       // Validate UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       return uuidRegex.test(id);
     });
 

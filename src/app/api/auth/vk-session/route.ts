@@ -1,10 +1,10 @@
 import { encode } from "@auth/core/jwt";
-import { logger } from "~/lib/logger";
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { logger } from "~/lib/logger";
 import { db } from "~/server/db";
 import { sessions, users } from "~/server/db/schema";
 

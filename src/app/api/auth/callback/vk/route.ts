@@ -1,9 +1,10 @@
 import { decode as authDecode } from "@auth/core/jwt";
-import { logger } from "~/lib/logger";
 import { hkdf } from "@panva/hkdf";
 import * as jose from "jose";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+
+import { logger } from "~/lib/logger";
 
 const VK_CLIENT_ID = process.env.VK_CLIENT_ID!;
 const VK_CLIENT_SECRET = process.env.VK_CLIENT_SECRET!;

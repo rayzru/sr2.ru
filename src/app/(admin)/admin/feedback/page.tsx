@@ -148,6 +148,8 @@ function ViewDialog({ feedbackId, open, onOpenChange, onSuccess }: ViewDialogPro
       toast({ title: "Обращение обновлено" });
       utils.feedback.admin.list.invalidate();
       utils.feedback.admin.byId.invalidate({ id: feedbackId! });
+      utils.admin.dashboardStats.invalidate();
+      utils.admin.navCounts.invalidate();
       onSuccess();
     },
     onError: (error) => {
@@ -160,6 +162,8 @@ function ViewDialog({ feedbackId, open, onOpenChange, onSuccess }: ViewDialogPro
       toast({ title: "Ответ отправлен" });
       utils.feedback.admin.list.invalidate();
       utils.feedback.admin.byId.invalidate({ id: feedbackId! });
+      utils.admin.dashboardStats.invalidate();
+      utils.admin.navCounts.invalidate();
       setResponse("");
       onSuccess();
     },
@@ -508,6 +512,8 @@ export default function AdminFeedbackPage() {
       setDeleteId(null);
       setShowDeleteDialog(false);
       void utils.feedback.admin.list.invalidate();
+      void utils.admin.dashboardStats.invalidate();
+      void utils.admin.navCounts.invalidate();
       void refetch();
     },
     onError: (error) => {
@@ -528,6 +534,8 @@ export default function AdminFeedbackPage() {
       setSelectedFeedbackIds(new Set());
       setShowBulkDeleteDialog(false);
       void utils.feedback.admin.list.invalidate();
+      void utils.admin.dashboardStats.invalidate();
+      void utils.admin.navCounts.invalidate();
       void refetch();
     },
     onError: (error) => {
@@ -650,19 +658,11 @@ export default function AdminFeedbackPage() {
         <div className="bg-muted flex items-center gap-2 rounded-md border p-3">
           <span className="text-sm font-medium">Выбрано: {selectedFeedbackIds.size}</span>
           <Separator orientation="vertical" className="h-6" />
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowBulkDeleteDialog(true)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => setShowBulkDeleteDialog(true)}>
             <Trash2 className="mr-2 h-4 w-4" />
             Удалить выбранные
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSelectedFeedbackIds(new Set())}
-          >
+          <Button variant="outline" size="sm" onClick={() => setSelectedFeedbackIds(new Set())}>
             Отменить выбор
           </Button>
         </div>
@@ -680,10 +680,7 @@ export default function AdminFeedbackPage() {
             <div className="bg-muted/50 text-muted-foreground flex items-center gap-4 border-b px-4 py-3 text-sm font-medium">
               <div className="w-12">
                 <Checkbox
-                  checked={
-                    selectedFeedbackIds.size === data.items.length &&
-                    data.items.length > 0
-                  }
+                  checked={selectedFeedbackIds.size === data.items.length && data.items.length > 0}
                   onCheckedChange={toggleAll}
                   aria-label="Выбрать все"
                 />
@@ -867,12 +864,10 @@ export default function AdminFeedbackPage() {
       <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Удаление {selectedFeedbackIds.size} обращений
-            </AlertDialogTitle>
+            <AlertDialogTitle>Удаление {selectedFeedbackIds.size} обращений</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие пометит {selectedFeedbackIds.size} обращений как удалённые.
-              Обращения будут скрыты из общего списка, но сохранятся в системе для аудита.
+              Это действие пометит {selectedFeedbackIds.size} обращений как удалённые. Обращения
+              будут скрыты из общего списка, но сохранятся в системе для аудита.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -901,8 +896,8 @@ export default function AdminFeedbackPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Удаление обращения</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие пометит обращение как удалённое.
-              Оно будет скрыто из общего списка, но сохранится в системе для аудита.
+              Это действие пометит обращение как удалённое. Оно будет скрыто из общего списка, но
+              сохранится в системе для аудита.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

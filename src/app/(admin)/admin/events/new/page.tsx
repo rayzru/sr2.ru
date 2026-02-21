@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import type { JSONContent } from "@tiptap/react";
+
 import {
   ArrowLeft,
   Calendar,
@@ -23,6 +25,8 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { z } from "zod";
 
+import { ContentSearch, type LinkedContent } from "~/components/content-search";
+import { StandardEditor } from "~/components/editor/rich-editor";
 import { ImageUploader } from "~/components/media/image-uploader";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -40,7 +44,6 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { Switch } from "~/components/ui/switch";
-import { Textarea } from "~/components/ui/textarea";
 import { useToast } from "~/hooks/use-toast";
 import { EVENT_RECURRENCE_TYPE_LABELS, type EventRecurrenceType } from "~/server/db/schema";
 import { api } from "~/trpc/react";
@@ -52,7 +55,7 @@ const eventFormSchema = z
       .string()
       .min(1, "Введите название мероприятия")
       .max(255, "Название слишком длинное (макс. 255 символов)"),
-    description: z.string().max(5000, "Описание слишком длинное").optional(),
+    description: z.custom<JSONContent>().optional(),
     coverImage: z.string().max(500).optional(),
     publishAt: z.date().optional(), // Дата и время публикации
     eventStartAt: z.date({ error: "Укажите дату и время начала" }),
@@ -103,7 +106,7 @@ export default function NewEventPage() {
 
   // Form state
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState<JSONContent>({ type: "doc", content: [] });
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [publishAt, setPublishAt] = useState<Date | undefined>();
   const [eventStartAt, setEventStartAt] = useState<Date | undefined>();
@@ -117,13 +120,12 @@ export default function NewEventPage() {
   const [isUrgent, setIsUrgent] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [publishToTelegram, setPublishToTelegram] = useState(false);
+  const [eventAllDay, setEventAllDay] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   // Recurrence state
   const [eventRecurrenceType, setEventRecurrenceType] = useState<EventRecurrenceType>("none");
-  const [eventRecurrenceStartDay, setEventRecurrenceStartDay] = useState<string>("");
-  const [eventRecurrenceEndDay, setEventRecurrenceEndDay] = useState<string>("");
-  const [linkedArticleId, setLinkedArticleId] = useState<string>("");
+  const [linkedContentIds, setLinkedContentIds] = useState<LinkedContent[]>([]);
 
   // Check if user is admin
   const isAdmin =
@@ -133,13 +135,6 @@ export default function NewEventPage() {
 
   // Get buildings for selector
   const { data: buildings } = api.profile.getAvailableBuildings.useQuery();
-
-  // Get articles for linked article selector
-  const { data: articlesData } = api.knowledge.admin.list.useQuery({
-    page: 1,
-    limit: 50,
-    status: "published",
-  });
 
   // Create mutation
   const createMutation = api.publications.create.useMutation({
@@ -158,9 +153,9 @@ export default function NewEventPage() {
 
     const formData = {
       title: title.trim(),
-      description: description.trim() || undefined,
       coverImage: coverImage || undefined,
       publishAt,
+      eventAllDay,
       eventStartAt,
       eventEndAt,
       eventLocation: eventLocation.trim() || undefined,
@@ -201,14 +196,7 @@ export default function NewEventPage() {
 
     createMutation.mutate({
       title: validData.title,
-      content: validData.description
-        ? {
-            type: "doc",
-            content: [
-              { type: "paragraph", content: [{ type: "text", text: validData.description }] },
-            ],
-          }
-        : { type: "doc", content: [] },
+      content: description,
       type: "event",
       coverImage: validData.coverImage,
       buildingId: validData.buildingId || undefined,
@@ -216,6 +204,7 @@ export default function NewEventPage() {
       isAnonymous: validData.isAnonymous,
       publishAt: validData.publishAt,
       publishToTelegram: validData.publishToTelegram,
+      eventAllDay,
       eventStartAt: validData.eventStartAt,
       eventEndAt: validData.eventEndAt,
       eventLocation: validData.eventLocation,
@@ -225,13 +214,7 @@ export default function NewEventPage() {
       eventOrganizerPhone: validData.eventOrganizerPhone,
       // Recurrence fields
       eventRecurrenceType: eventRecurrenceType !== "none" ? eventRecurrenceType : undefined,
-      eventRecurrenceStartDay: eventRecurrenceStartDay
-        ? parseInt(eventRecurrenceStartDay, 10)
-        : undefined,
-      eventRecurrenceEndDay: eventRecurrenceEndDay
-        ? parseInt(eventRecurrenceEndDay, 10)
-        : undefined,
-      linkedArticleId: linkedArticleId || undefined,
+      linkedContentIds: linkedContentIds.length > 0 ? linkedContentIds : undefined,
     });
   };
 
@@ -280,18 +263,13 @@ export default function NewEventPage() {
                   {errors.title && <p className="text-destructive text-sm">{errors.title}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Описание</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                  <Label>Описание</Label>
+                  <StandardEditor
+                    content={description}
+                    onChange={setDescription}
                     placeholder="Подробности о мероприятии..."
-                    rows={6}
-                    className={errors.description ? "border-destructive" : ""}
+                    minHeight="200px"
                   />
-                  {errors.description && (
-                    <p className="text-destructive text-sm">{errors.description}</p>
-                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <Switch id="urgent" checked={isUrgent} onCheckedChange={setIsUrgent} />
@@ -310,27 +288,50 @@ export default function NewEventPage() {
                 <CardDescription>Когда состоится мероприятие</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Switch id="allDay" checked={eventAllDay} onCheckedChange={setEventAllDay} />
+                  <Label htmlFor="allDay">Весь день (без конкретного времени)</Label>
+                </div>
                 <div className="space-y-2">
-                  <Label>Начало мероприятия *</Label>
-                  <DateTimePicker
-                    value={eventStartAt}
-                    onChange={setEventStartAt}
-                    placeholder="Выберите дату и время начала"
-                    className={errors.eventStartAt ? "border-destructive" : ""}
-                  />
+                  <Label>{eventAllDay ? "Дата начала *" : "Начало мероприятия *"}</Label>
+                  {eventAllDay ? (
+                    <DatePicker
+                      value={eventStartAt}
+                      onChange={setEventStartAt}
+                      placeholder="Выберите дату начала"
+                      className={errors.eventStartAt ? "border-destructive" : ""}
+                    />
+                  ) : (
+                    <DateTimePicker
+                      value={eventStartAt}
+                      onChange={setEventStartAt}
+                      placeholder="Выберите дату и время начала"
+                      className={errors.eventStartAt ? "border-destructive" : ""}
+                    />
+                  )}
                   {errors.eventStartAt && (
                     <p className="text-destructive text-sm">{errors.eventStartAt}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label>Окончание мероприятия</Label>
-                  <DateTimePicker
-                    value={eventEndAt}
-                    onChange={setEventEndAt}
-                    placeholder="Выберите дату и время окончания"
-                    fromDate={eventStartAt}
-                    className={errors.eventEndAt ? "border-destructive" : ""}
-                  />
+                  <Label>{eventAllDay ? "Дата окончания" : "Окончание мероприятия"}</Label>
+                  {eventAllDay ? (
+                    <DatePicker
+                      value={eventEndAt}
+                      onChange={setEventEndAt}
+                      placeholder="Выберите дату окончания"
+                      fromDate={eventStartAt}
+                      className={errors.eventEndAt ? "border-destructive" : ""}
+                    />
+                  ) : (
+                    <DateTimePicker
+                      value={eventEndAt}
+                      onChange={setEventEndAt}
+                      placeholder="Выберите дату и время окончания"
+                      fromDate={eventStartAt}
+                      className={errors.eventEndAt ? "border-destructive" : ""}
+                    />
+                  )}
                   {errors.eventEndAt && (
                     <p className="text-destructive text-sm">{errors.eventEndAt}</p>
                   )}
@@ -355,7 +356,7 @@ export default function NewEventPage() {
                     onValueChange={(v) => setEventRecurrenceType(v as EventRecurrenceType)}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Без повторения" />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.entries(EVENT_RECURRENCE_TYPE_LABELS).map(([value, label]) => (
@@ -367,75 +368,44 @@ export default function NewEventPage() {
                   </Select>
                 </div>
 
-                {eventRecurrenceType === "monthly" && (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="recurrenceStartDay">Начало периода (день месяца)</Label>
-                      <Input
-                        id="recurrenceStartDay"
-                        type="number"
-                        min="1"
-                        max="31"
-                        value={eventRecurrenceStartDay}
-                        onChange={(e) => setEventRecurrenceStartDay(e.target.value)}
-                        placeholder="Например: 18"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="recurrenceEndDay">Конец периода (день месяца)</Label>
-                      <Input
-                        id="recurrenceEndDay"
-                        type="number"
-                        min="1"
-                        max="31"
-                        value={eventRecurrenceEndDay}
-                        onChange={(e) => setEventRecurrenceEndDay(e.target.value)}
-                        placeholder="Например: 26"
-                      />
-                    </div>
-                  </div>
+                {eventRecurrenceType === "monthly" && eventStartAt && (
+                  <p className="text-muted-foreground bg-muted rounded-md p-3 text-sm">
+                    {eventEndAt && eventStartAt.getDate() !== eventEndAt.getDate()
+                      ? `${eventStartAt.getDate()} — ${eventEndAt.getDate()} числа каждого месяца`
+                      : `${eventStartAt.getDate()} числа каждого месяца`}
+                  </p>
                 )}
 
-                {eventRecurrenceType !== "none" &&
-                  eventRecurrenceStartDay &&
-                  eventRecurrenceEndDay && (
-                    <p className="text-muted-foreground bg-muted rounded-md p-3 text-sm">
-                      Событие будет повторяться ежемесячно с {eventRecurrenceStartDay} по{" "}
-                      {eventRecurrenceEndDay} число
-                    </p>
-                  )}
+                {eventRecurrenceType === "yearly" && eventStartAt && (
+                  <p className="text-muted-foreground bg-muted rounded-md p-3 text-sm">
+                    {new Intl.DateTimeFormat("ru-RU", {
+                      day: "numeric",
+                      month: "long",
+                      timeZone: "Europe/Moscow",
+                    }).format(eventStartAt)}{" "}
+                    каждый год
+                  </p>
+                )}
               </CardContent>
             </Card>
 
-            {/* Linked Article */}
+            {/* Linked Content */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Связанная статья
+                  Связанный контент
                 </CardTitle>
-                <CardDescription>Ссылка на статью базы знаний</CardDescription>
+                <CardDescription>
+                  Ссылки на новости, публикации, события или статьи базы знаний
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <Select
-                  value={linkedArticleId || "none"}
-                  onValueChange={(v) => setLinkedArticleId(v === "none" ? "" : v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Выберите статью (опционально)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Без связанной статьи</SelectItem>
-                    {articlesData?.articles.map((article) => (
-                      <SelectItem key={article.id} value={article.id}>
-                        {article.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-muted-foreground mt-2 text-xs">
-                  Подробная инструкция будет показана в карточке события
-                </p>
+                <ContentSearch
+                  value={linkedContentIds}
+                  onChange={setLinkedContentIds}
+                  placeholder="Поиск по названию..."
+                />
               </CardContent>
             </Card>
 

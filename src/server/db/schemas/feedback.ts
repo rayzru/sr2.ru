@@ -115,6 +115,9 @@ export const feedback = createTable(
     respondedAt: timestamp("responded_at", { withTimezone: true }),
     respondedById: varchar("responded_by_id", { length: 255 }).references(() => users.id),
 
+    // ========== Test Field (for migration verification) ==========
+    testMigrationField: varchar("test_migration_field", { length: 100 }),
+
     // ========== Soft Delete ==========
     // Обращения не удаляются физически, только помечаются удалёнными
     isDeleted: boolean("is_deleted").notNull().default(false),

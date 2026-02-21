@@ -8,9 +8,9 @@
  * Usage: bun run src/server/db/migrate.ts
  */
 
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { sql } from "drizzle-orm";
 import postgres from "postgres";
 
 async function runMigrations() {
@@ -37,7 +37,7 @@ async function runMigrations() {
       `);
       console.log(`✓ Found ${result.length} applied migrations in database`);
       if (result.length > 0) {
-        console.log(`  Last applied migration: ${result[result.length - 1]?.hash || 'unknown'}`);
+        console.log(`  Last applied migration: ${result[result.length - 1]?.hash || "unknown"}`);
       }
     } catch (e) {
       console.log("  No migrations table found - this appears to be first run");

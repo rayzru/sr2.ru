@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import { logger } from "~/lib/logger";
 import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { logger } from "~/lib/logger";
 import { db } from "~/server/db";
 import { accounts, userRoles, users } from "~/server/db/schema";
 

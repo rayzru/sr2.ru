@@ -15,7 +15,11 @@ export default async function AdminUsersPage() {
     <div className="space-y-6">
       <AdminPageHeader title="Пользователи" description="Управление пользователями системы" />
 
-      <UsersTable canManageRoles={canManageRoles} canDeleteUsers={canDeleteUsers} canHardDeleteUsers={canHardDeleteUsers} />
+      <UsersTable
+        canManageRoles={canManageRoles}
+        canDeleteUsers={canDeleteUsers}
+        canHardDeleteUsers={canHardDeleteUsers}
+      />
     </div>
   );
 }

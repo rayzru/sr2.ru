@@ -1,8 +1,8 @@
-import { logger } from "~/lib/logger";
-
 import { asc } from "drizzle-orm";
 import { writeFileSync } from "fs";
 import { join } from "path";
+
+import { logger } from "~/lib/logger";
 
 import { apartments, buildings, entrances, floors } from "./schemas/buildings";
 import { parkingFloors, parkings, parkingSpots } from "./schemas/parkings";

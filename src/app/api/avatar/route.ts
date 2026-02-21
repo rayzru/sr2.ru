@@ -1,11 +1,11 @@
 import { randomUUID } from "crypto";
-import { logger } from "~/lib/logger";
 import { eq } from "drizzle-orm";
 import fs from "fs/promises";
 import { type NextRequest, NextResponse } from "next/server";
 import path from "path";
 import sharp from "sharp";
 
+import { logger } from "~/lib/logger";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { userProfiles } from "~/server/db/schema";

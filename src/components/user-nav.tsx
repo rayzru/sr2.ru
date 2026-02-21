@@ -1,68 +1,100 @@
-import Link from "next/link";
+"use client";
 
-import { auth } from "~/server/auth";
+import { LayoutDashboard, LogOut, Shield } from "lucide-react";
+import Link from "next/link";
+import { signOut } from "next-auth/react";
+
+import { CABINET_ITEMS } from "~/lib/navigation";
+import { getRankConfig } from "~/lib/ranks";
+import { cn } from "~/lib/utils";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export async function UserNav() {
-  const session = await auth();
-  const userName = session?.user?.name ?? "Я";
-  const userEmail = session?.user?.email ?? "";
-  const userImage = session?.user?.image ?? "";
+interface UserNavProps {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    roles?: string[];
+  };
+  isAdmin?: boolean;
+}
+
+export function UserNav({ user, isAdmin }: UserNavProps) {
+  const rankConfig = getRankConfig((user.roles ?? []) as Parameters<typeof getRankConfig>[0]);
 
   return (
-    <>
-      {!session && (
-        <Link
-          href="/login"
-          className="text-muted-foreground hover:text-primary text-sm font-medium transition-colors"
-        >
-          Войти
-        </Link>
-      )}
-      {session && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={userImage} alt="" />
-                <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{userName}</p>
-                <p className="text-muted-foreground text-xs leading-none">{userEmail}</p>
-              </div>
-            </DropdownMenuLabel>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="hidden gap-2 lg:flex">
+          <Avatar
+            className={cn(
+              "ring-offset-background h-6 w-6 shrink-0 ring-2 ring-offset-1",
+              rankConfig.ringColor
+            )}
+          >
+            <AvatarImage src={user.image ?? undefined} />
+            <AvatarFallback className="text-[10px]">{user.name?.slice(0, 2)}</AvatarFallback>
+          </Avatar>
+          <span className="max-w-36 truncate text-sm">{user.name ?? "Кабинет"}</span>
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-56">
+        {/* User info */}
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-sm font-medium leading-none">{user.name ?? "Пользователь"}</p>
+            {user.email && (
+              <p className="text-muted-foreground text-xs leading-none">{user.email}</p>
+            )}
+          </div>
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator />
+
+        {/* Cabinet links */}
+        {CABINET_ITEMS.map((item) => (
+          <DropdownMenuItem key={item.href} asChild>
+            <Link href={item.href} data-testid={item.testId}>
+              {item.href === "/my" && <LayoutDashboard className="mr-2 h-4 w-4" />}
+              {item.title}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+
+        {/* Admin link */}
+        {isAdmin && (
+          <>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/my"
-                  className="text-muted-foreground hover:text-primary text-sm font-medium leading-none transition-colors"
-                >
-                  Мой кабинет
-                  <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </>
+            <DropdownMenuItem asChild>
+              <Link href="/admin" data-testid="nav-admin">
+                <Shield className="mr-2 h-4 w-4" />
+                Администрирование
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          className="text-destructive focus:text-destructive cursor-pointer"
+          onClick={() => signOut()}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Выйти
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -1,7 +1,6 @@
 import type { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
+
 import { logger } from "~/lib/logger";
-
-
 
 export interface VKIDProfile {
   user: {

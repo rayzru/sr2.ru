@@ -1,25 +1,15 @@
 import type { JSONContent } from "@tiptap/react";
-import { logger } from "~/lib/logger";
-
-
 import { TRPCError } from "@trpc/server";
-
 import { and, count, desc, eq, gte, lte, or, sql } from "drizzle-orm";
-
 import { z } from "zod";
 
-
 import { extractPlainText } from "~/lib/editor";
-
+import { logger } from "~/lib/logger";
 import { deleteImage } from "~/lib/upload/image-processor";
-
 import { news, newsStatusEnum, newsTags, newsTypeEnum } from "~/server/db/schema";
-
 import { sendTelegramNotificationAsync } from "~/server/notifications/telegram";
 
-
 import { adminProcedureWithFeature, createTRPCRouter, publicProcedure } from "../trpc";
-
 
 // ============================================================================
 // Validation Schemas

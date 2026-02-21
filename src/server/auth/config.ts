@@ -512,10 +512,7 @@ export const authConfig = {
           }
         }
 
-        authLogger.info(
-          { userId: user?.id, provider: account?.provider },
-          "User signed in"
-        );
+        authLogger.info({ userId: user?.id, provider: account?.provider }, "User signed in");
         return true;
       } catch (error) {
         authLogger.error("Error in signIn callback", error);
@@ -593,10 +590,7 @@ export const authConfig = {
           },
         };
       } catch (error) {
-        authLogger.error(
-          { err: error, userId },
-          "Unexpected error in session callback"
-        );
+        authLogger.error({ err: error, userId }, "Unexpected error in session callback");
         // Return session with minimal data to prevent complete auth failure
         return {
           ...session,

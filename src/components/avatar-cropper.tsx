@@ -2,8 +2,6 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import { logger } from "~/lib/logger";
-
 import { Camera, Loader2, Trash2, Upload, X, ZoomIn, ZoomOut } from "lucide-react";
 import ReactCrop, { centerCrop, type Crop, makeAspectCrop, type PixelCrop } from "react-image-crop";
 
@@ -18,6 +16,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Slider } from "~/components/ui/slider";
+import { logger } from "~/lib/logger";
 import { cn } from "~/lib/utils";
 
 import "react-image-crop/dist/ReactCrop.css";

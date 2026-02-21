@@ -1,7 +1,6 @@
 import { type SVGProps, useEffect, useState } from "react";
 
 import { logger } from "~/lib/logger";
-
 import { cn } from "~/lib/utils";
 
 interface MapCompactPickerProps {

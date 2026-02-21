@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { logger } from "~/lib/logger";
 
+import { logger } from "~/lib/logger";
 import {
   MAX_DOCUMENT_SIZE,
   processAndSaveDocument,

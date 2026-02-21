@@ -176,10 +176,7 @@ export async function sendEmail<T extends EmailTemplateId>(
       html,
     });
 
-    emailLogger.info(
-      { templateId, to, messageId: info.messageId },
-      "Email sent successfully"
-    );
+    emailLogger.info({ templateId, to, messageId: info.messageId }, "Email sent successfully");
 
     return {
       success: true,

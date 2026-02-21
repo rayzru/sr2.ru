@@ -1,17 +1,12 @@
 "use client";
 
-import { logger } from "~/lib/logger";
-
 import { useCallback, useEffect, useRef } from "react";
 
-
 import { usePathname, useSearchParams } from "next/navigation";
-
 import type React from "react";
 
-
+import { logger } from "~/lib/logger";
 import { api } from "~/trpc/react";
-
 
 const SESSION_STORAGE_KEY = "analytics_session_id";
 

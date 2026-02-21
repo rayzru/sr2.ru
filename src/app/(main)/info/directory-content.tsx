@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   BookOpen,
@@ -76,6 +76,7 @@ type Entry = {
 type DirectoryContentProps = {
   initialTags: Tag[];
   initialEntries: { entries: Entry[]; total: number };
+  contentSlot?: React.ReactNode;
 };
 
 // Tag groups for quick access
@@ -121,7 +122,7 @@ const CONTACT_ICONS: Record<string, typeof Phone> = {
   other: ExternalLink,
 };
 
-export function DirectoryContent({ initialTags }: DirectoryContentProps) {
+export function DirectoryContent({ initialTags, contentSlot }: DirectoryContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTagSlug, setSelectedTagSlug] = useState<string | null>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -710,6 +711,21 @@ export function DirectoryContent({ initialTags }: DirectoryContentProps) {
           }}
         />
       )}
+
+      {/* Content section — slides in when idle, hides during search */}
+      <AnimatePresence>
+        {!hasActiveQuery && contentSlot && (
+          <motion.div
+            key="home-content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+          >
+            {contentSlot}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
